@@ -100,6 +100,8 @@ def mostrar_modal(clinica):
     modal.title("Seleção de Convênio")
     largura_modal = 400
     altura_modal = 300
+    icon_path = os.path.abspath("images/favicon.ico")
+    modal.iconbitmap(icon_path)
     
     # Obtém as dimensões da tela
     largura_tela = modal.winfo_screenwidth()
