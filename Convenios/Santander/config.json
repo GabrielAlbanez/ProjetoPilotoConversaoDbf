@@ -1,0 +1,18 @@
+
+{
+    "output_directory": "FilesOutPut",
+    "output_file_name": "Tabela_Convertida.dbf",
+    "columns": [
+        "CÓDIGO",
+        "DESCRIÇÃO DO PROCEDIMENTO",
+        "P.A.",
+        "QTDE. AUXILIAR",
+        "FILME",
+        "INCIDÊNCIA",
+        "VALOR PROCEDIMENTO"
+    ],
+    "skip_rows": 6,
+    "DiretorioArquivoXlsx": "Convenios/Santander"
+
+}
+ 

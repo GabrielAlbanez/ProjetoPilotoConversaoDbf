@@ -1,0 +1,11 @@
+{
+    "Convenios": [
+        "Santander",
+        "Bradesco",
+        "Unimed",
+        "oba",
+        "Boudrini"
+    ],
+
+    "output_directory": "FilesOutPut"
+}
