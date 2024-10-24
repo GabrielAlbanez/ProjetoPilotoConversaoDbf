@@ -1,7 +1,7 @@
 {
     "DiretorioArquivoXlsx": "Convenios/Boudrini",
     "output_directory": "FilesOutPut",
-    "output_file_name": "Tabela_Convertida.dbf",
+    "output_file_name": "Tabela Convertida.dbf",
     "skip_rows": 0,
     "columns": []
 }
