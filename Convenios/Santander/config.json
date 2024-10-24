@@ -2,6 +2,7 @@
 {
     "output_directory": "FilesOutPut",
     "output_file_name": "Tabela_Convertida.dbf",
+    "input_file_name": "Tabela_do_Cliente.xlsx",
     "columns": [
         "CÓDIGO",
         "DESCRIÇÃO DO PROCEDIMENTO",
@@ -12,7 +13,7 @@
         "VALOR PROCEDIMENTO"
     ],
     "skip_rows": 6,
-    "DiretorioArquivoXlsx": "Convenios/Santander"
+    "DiretorioArquivoXlsx": "Convenios/Santander/"
 
 }
  
