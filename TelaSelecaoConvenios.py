@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.font as tkFont
 import os.path
 
 # Definições de cores e estilos
@@ -24,7 +25,7 @@ class Toplevel1:
     def __init__(self, top=None):
         top.geometry("600x472+337+104")
         top.title("Seleção de Convênio")
-        top.configure(borderwidth="10", relief="ridge", background="#696969")
+        top.configure(borderwidth="10", background="#ffffff")
 
         self.top = top
         _style_code()
@@ -39,7 +40,13 @@ class Toplevel1:
         self.btn_remove = ttk.Button(self.top, text='Remover convênio')
         self.btn_remove.place(relx=0.583, rely=0.6, height=26, width=150)
 
-        self.label_convenio = ttk.Label(self.top, text='Convênio selecionado!')
+        # Definindo a família e o tamanho da fonte
+        font_family = "Poppins"  # Fonte desejada
+        font_size = 17
+        custom_font = tkFont.Font(family=font_family, size=font_size)
+
+        # Criando um Label com a fonte personalizada
+        self.label_convenio = ttk.Label(self.top, text='Convênio selecionado!', font=custom_font)
         self.label_convenio.place(relx=0.2, rely=0.233, height=49, width=360)
 
         # Barra de progresso
