@@ -4,7 +4,7 @@ import json
 import subprocess
 import os
 import shutil
-from TelaSelecaoConvenios import Toplevel1  # Importando a interface gráfica
+from TelaSelecaoConvenios import Toplevel1
 
 def carregar_configuracao(caminho_config):
     with open(caminho_config, 'r', encoding='utf-8') as f:
@@ -87,6 +87,7 @@ def takeArchive():
     arquivos = filedialog.askopenfilenames(title="Selecione arquivos .xlsx", filetypes=[("Excel files", "*.xlsx")])
     return list(arquivos)
 
+
 def iniciar_upload(clinica, progress_bar):
     arquivos_xlsx = takeArchive()
     if not arquivos_xlsx:
@@ -95,32 +96,32 @@ def iniciar_upload(clinica, progress_bar):
 
     progress_var = tk.DoubleVar()
     progress_bar.config(variable=progress_var)
-    iniciar_processo(arquivos_xlsx, progress_var)
+    iniciar_processo(arquivos_xlsx, progress_var, clinica)
 
-def iniciar_processo(arquivos, progress_var):
+def iniciar_processo(arquivos, progress_var, clinica):
     total_arquivos = len(arquivos)
     
     for i, arquivo in enumerate(arquivos):
-        # Lógica para processar o arquivo
-        # ...
+        try:
+            # Lógica para processar o arquivo
+            # Aqui você deve referenciar o arquivo Python correto para o convênio
+            caminho_arquivo = os.path.join("Convenios", clinica, f"{clinica.lower()}.py")
+            
+            # Verifique se o arquivo Python existe antes de tentar executá-lo
+            if not os.path.exists(caminho_arquivo):
+                messagebox.showerror("Erro", f"Arquivo '{clinica.lower()}.py' não encontrado.")
+                return
 
-        progress_var.set((i + 1) / total_arquivos * 100)  # Atualiza a barra de progresso
+            # Aqui, você pode passar o arquivo Excel como argumento, se necessário
+            subprocess.run(["python", caminho_arquivo, arquivo], check=True)  # Passando o arquivo como argumento
+            
+            progress_var.set((i + 1) / total_arquivos * 100)  # Atualiza a barra de progresso
+        except Exception as e:
+            messagebox.showerror("Erro", f"Ocorreu um erro ao executar o arquivo: {e}")
+            return  # Interrompa o processamento se ocorrer um erro
 
     messagebox.showinfo("Sucesso", "Processamento concluído!")
 
-def fazer_upload(clinica):
-    caminho_arquivo = filedialog.askopenfilename(title="Selecione um arquivo para upload")
-    if not caminho_arquivo:
-        messagebox.showwarning("Upload Cancelado", "Nenhum arquivo selecionado.")
-        return
-
-    caminho_destino = os.path.join(os.getcwd(), f"Convenios/{clinica}/{os.path.basename(caminho_arquivo)}")
-    try:
-        shutil.copyfile(caminho_arquivo, caminho_destino)
-        messagebox.showinfo("Sucesso", f"Arquivo enviado para {clinica} com sucesso!")
-        executar_arquivo(clinica)
-    except Exception as e:
-        messagebox.showerror("Erro", f"Ocorreu um erro ao enviar o arquivo: {e}")
 
 def atualizar_combobox():
     combobox['values'] = config["Convenios"]
