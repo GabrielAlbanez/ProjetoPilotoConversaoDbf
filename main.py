@@ -101,11 +101,26 @@ def iniciar_upload(clinica, progress_bar):
 def iniciar_processo(arquivos, progress_var, clinica):
     total_arquivos = len(arquivos)
     
+    # Definir o diretório de destino para onde os arquivos devem ser movidos
+    dir_destino = os.path.join("Convenios", clinica)
+
     for i, arquivo in enumerate(arquivos):
         try:
-            # Lógica para processar o arquivo
-            # Aqui você deve referenciar o arquivo Python correto para o convênio
-            caminho_arquivo = os.path.join("Convenios", clinica, f"{clinica.lower()}.py")
+            # Mover o arquivo Excel para o diretório do convênio
+            shutil.copy(arquivo, dir_destino)  # Copiar o arquivo para a pasta do convênio
+            
+            # Encontrar o arquivo .xlsx mais recente no diretório
+            arquivos = [f for f in os.listdir(dir_destino) if f.endswith('.xlsx')]
+            if not arquivos:
+                messagebox.showwarning("Aviso", "Nenhum arquivo .xlsx encontrado no diretório do convênio.")
+                return
+            
+            # O arquivo mais recente
+            arquivo_excel = os.path.join(dir_destino, sorted(arquivos, key=os.path.getctime)[-1])
+            print(f"Processando arquivo: {arquivo_excel}")
+
+            # Definir o caminho do arquivo Python do convênio
+            caminho_arquivo = os.path.join(dir_destino, f"{clinica.lower()}.py")
             
             # Verifique se o arquivo Python existe antes de tentar executá-lo
             if not os.path.exists(caminho_arquivo):
@@ -113,7 +128,7 @@ def iniciar_processo(arquivos, progress_var, clinica):
                 return
 
             # Aqui, você pode passar o arquivo Excel como argumento, se necessário
-            subprocess.run(["python", caminho_arquivo, arquivo], check=True)  # Passando o arquivo como argumento
+            subprocess.run(["python", caminho_arquivo, arquivo_excel], check=True)  # Passando o arquivo como argumento
             
             progress_var.set((i + 1) / total_arquivos * 100)  # Atualiza a barra de progresso
         except Exception as e:
@@ -121,7 +136,6 @@ def iniciar_processo(arquivos, progress_var, clinica):
             return  # Interrompa o processamento se ocorrer um erro
 
     messagebox.showinfo("Sucesso", "Processamento concluído!")
-
 
 def atualizar_combobox():
     combobox['values'] = config["Convenios"]
