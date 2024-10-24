@@ -3,8 +3,7 @@ import os
 import dbf
 import json
 import difflib
-import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
 
 # Função para carregar configurações do arquivo JSON
 def carregar_config():
@@ -28,8 +27,8 @@ def gerar_mapeamento(colunas_df, colunas_dbf, cutoff=0.9):
             mapping[col_dbf] = melhor_correspondencia[0]
     return mapping
 
-# Função principal para processar o Excel e converter para DBF com barra de progresso
-def processar_excel_para_dbf(arquivo, progress_var, progress_bar, root):
+# Função principal para processar o Excel e converter para DBF
+def processar_excel_para_dbf(arquivo, progress_var):
     config = carregar_config()
 
     try:
@@ -84,7 +83,6 @@ def processar_excel_para_dbf(arquivo, progress_var, progress_bar, root):
 
                     # Atualiza a barra de progresso
                     progress_var.set(min((index + 1) / total_rows * 100, 100))
-                    root.update_idletasks()
 
                 except Exception as e:
                     print(f"Erro ao adicionar linha {index}: {e}")
@@ -100,21 +98,18 @@ def processar_excel_para_dbf(arquivo, progress_var, progress_bar, root):
     except Exception as e:
         print(f"Erro inesperado: {e}")
 
-    # Verifica se a barra de progresso chegou a 100% e fecha a janela
-    print(progress_var.get())
+    # Verifica se a barra de progresso chegou a 100% e exibe mensagem de sucesso
     if progress_var.get() == 100:
         messagebox.showinfo("Sucesso", "Upload realizado com sucesso!")
-        root.after(1000, root.destroy)  # Fechar janela após 1 segundo
 
 # Função para iniciar o processamento e exibir a barra de progresso
-def iniciar_processo():
-    arquivos_xlsx = takeArchive()
+def iniciar_processo(arquivos_xlsx, progress_var):
     if not arquivos_xlsx:
         print("Nenhum arquivo .xlsx encontrado.")
         return
 
     for arquivo in arquivos_xlsx:
-        processar_excel_para_dbf(arquivo, progress_var, progress_bar, root)
+        processar_excel_para_dbf(arquivo, progress_var)
         excluir_arquivo(arquivo)
 
 # Função para excluir o arquivo após o processamento
@@ -146,18 +141,3 @@ def takeArchive():
             arquivos_encontrados.append(caminho_arquivo)
 
     return arquivos_encontrados
-
-# Configurações da janela e barra de progresso
-root = tk.Tk()
-root.title("Conversão de Excel para DBF")
-root.geometry("400x150")
-
-
-progress_var = tk.DoubleVar()
-progress_bar = ttk.Progressbar(root, variable=progress_var, maximum=100)
-progress_bar.pack(pady=20)
-
-start_button = tk.Button(root, text="Iniciar Conversão", command=iniciar_processo)
-start_button.pack(pady=10)
-
-root.mainloop()

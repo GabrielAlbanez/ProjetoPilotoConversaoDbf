@@ -4,7 +4,7 @@ import json
 import subprocess
 import os
 import shutil
-from TelaSelecaoConvenios import ModalSelecao  
+from TelaSelecaoConvenios import Toplevel1  # Importando a interface gráfica
 
 def carregar_configuracao(caminho_config):
     with open(caminho_config, 'r', encoding='utf-8') as f:
@@ -48,6 +48,8 @@ def remover_convenio(convenio, modal):
             atualizar_combobox()
         else:
             messagebox.showwarning("Aviso", f"Pasta '{convenio}' não encontrada.")
+    else:
+        messagebox.showwarning("Aviso", f"Convênio '{convenio}' não encontrado no JSON.")
 
 def atualizar_json(caminho_json, dados):
     with open(caminho_json, 'w', encoding='utf-8') as f:
@@ -62,6 +64,50 @@ def executar_arquivo(conv):
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro ao executar o arquivo: {e}")
 
+def mostrar_modal(clinica):
+    modal = tk.Toplevel(root)
+    app = Toplevel1(modal)
+
+    app.label_convenio.config(text=f'"{clinica}" selecionado!')
+    app.btn_upload.config(command=lambda: iniciar_upload(clinica, app.barra_progresso))
+    app.btn_remove.config(command=lambda: remover_convenio(clinica, modal))
+    app.btn_close.config(command=modal.destroy)
+
+    largura_modal, altura_modal = 600, 472
+    largura_tela = modal.winfo_screenwidth()
+    altura_tela = modal.winfo_screenheight()
+    x = (largura_tela // 2) - (largura_modal // 2)
+    y = (altura_tela // 2) - (altura_modal // 2)
+    modal.geometry(f"{largura_modal}x{altura_modal}+{x}+{y}")
+
+    modal.transient(root)
+    modal.grab_set()
+
+def takeArchive():
+    arquivos = filedialog.askopenfilenames(title="Selecione arquivos .xlsx", filetypes=[("Excel files", "*.xlsx")])
+    return list(arquivos)
+
+def iniciar_upload(clinica, progress_bar):
+    arquivos_xlsx = takeArchive()
+    if not arquivos_xlsx:
+        messagebox.showwarning("Aviso", "Nenhum arquivo .xlsx encontrado.")
+        return
+
+    progress_var = tk.DoubleVar()
+    progress_bar.config(variable=progress_var)
+    iniciar_processo(arquivos_xlsx, progress_var)
+
+def iniciar_processo(arquivos, progress_var):
+    total_arquivos = len(arquivos)
+    
+    for i, arquivo in enumerate(arquivos):
+        # Lógica para processar o arquivo
+        # ...
+
+        progress_var.set((i + 1) / total_arquivos * 100)  # Atualiza a barra de progresso
+
+    messagebox.showinfo("Sucesso", "Processamento concluído!")
+
 def fazer_upload(clinica):
     caminho_arquivo = filedialog.askopenfilename(title="Selecione um arquivo para upload")
     if not caminho_arquivo:
@@ -70,7 +116,7 @@ def fazer_upload(clinica):
 
     caminho_destino = os.path.join(os.getcwd(), f"Convenios/{clinica}/{os.path.basename(caminho_arquivo)}")
     try:
-        shutil.copy(caminho_arquivo, caminho_destino)
+        shutil.copyfile(caminho_arquivo, caminho_destino)
         messagebox.showinfo("Sucesso", f"Arquivo enviado para {clinica} com sucesso!")
         executar_arquivo(clinica)
     except Exception as e:
@@ -82,22 +128,33 @@ def atualizar_combobox():
 
 def mostrar_selecao():
     selecao = combobox.get()
-    if selecao:
-        ModalSelecao(root, selecao, remover_convenio, fazer_upload)
+    mostrar_modal(selecao)
 
 config = carregar_configuracao('config.json')
 criar_estrutura_convênios(config["Convenios"], config["output_directory"])
 
-root = tk.Tk()
-root.title("Lista de Convênios")
-root.geometry("600x400")
-root.configure(bg="#f0f0f0")
+def main():
+    global root
+    root = tk.Tk()
+    root.title("Lista de convênios")
 
-combobox = ttk.Combobox(root, values=config["Convenios"], font=("Arial", 12))
-combobox.set("Escolha um convênio")
-combobox.pack(pady=10)
+    largura_root, altura_root = 600, 400
+    largura_tela = root.winfo_screenwidth()
+    altura_tela = root.winfo_screenheight()
+    x = (largura_tela // 2) - (largura_root // 2)
+    y = (altura_tela // 2) - (altura_root // 2)
+    root.geometry(f"{largura_root}x{altura_root}+{x}+{y}")
+    root.configure(bg="#f0f0f0")
 
-botao = tk.Button(root, text="Selecionar", command=mostrar_selecao, bg="#4CAF50", fg="white", font=("Arial", 12))
-botao.pack(pady=20)
+    global combobox
+    combobox = ttk.Combobox(root, values=config["Convenios"], font=("Arial", 12))
+    combobox.set("Escolha um convênio")
+    combobox.pack(pady=10, padx=20)
 
-root.mainloop()
+    botao = tk.Button(root, text="Selecionar", command=mostrar_selecao, bg="#4CAF50", fg="white", font=("Arial", 12))
+    botao.pack(pady=20, padx=20)
+
+    root.mainloop()
+
+if __name__ == '__main__':
+    main()

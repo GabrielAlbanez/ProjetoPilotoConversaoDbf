@@ -1,39 +1,60 @@
+import sys
 import tkinter as tk
-from tkinter import messagebox, filedialog
-import os
-import shutil
+import tkinter.ttk as ttk
+from tkinter.constants import *
+import os.path
 
-class ModalSelecao:
-    def __init__(self, root, clinica, callback_remover, callback_upload):
-        self.modal = tk.Toplevel(root)
-        self.modal.title("Seleção de Convênio")
-        largura_modal, altura_modal = 400, 300
+# Definições de cores e estilos
+_bgcolor = '#d9d9d9'
+_fgcolor = '#000000'
+_style_code_ran = 0
 
-        # Centraliza a janela
-        largura_tela = self.modal.winfo_screenwidth()
-        altura_tela = self.modal.winfo_screenheight()
-        x = (largura_tela // 2) - (largura_modal // 2)
-        y = (altura_tela // 2) - (altura_modal // 2)
+def _style_code():
+    global _style_code_ran
+    if _style_code_ran:
+        return
+    try:
+        root.tk.call('source', os.path.join(os.path.dirname(__file__), 'themes', 'default.tcl'))
+    except:
+        pass
+    style = ttk.Style()
+    style.theme_use('default')
+    style.configure('.', font="TkDefaultFont")
+    _style_code_ran = 1
 
-        self.modal.geometry(f"{largura_modal}x{altura_modal}+{x}+{y}")
-        self.modal.transient(root)
-        self.modal.grab_set()
+class Toplevel1:
+    def __init__(self, top=None):
+        top.geometry("600x472+337+104")
+        top.title("Seleção de Convênio")
+        top.configure(borderwidth="10", relief="ridge", background="#696969")
 
-        # Label com a clínica selecionada
-        label = tk.Label(self.modal, text=f"Você selecionou: {clinica}", font=("Arial", 14))
-        label.pack(pady=20)
+        self.top = top
+        _style_code()
 
-        # Botão de Upload
-        upload_button = tk.Button(self.modal, text="Fazer Upload", bg="#4CAF50", fg="white",
-                                  font=("Arial", 12), command=lambda: callback_upload(clinica))
-        upload_button.pack(pady=10, padx=10)
+        # Botões da interface
+        self.btn_close = ttk.Button(self.top, text='Fechar', command=self.top.destroy)
+        self.btn_close.place(relx=0.417, rely=0.822, height=26, width=100)
 
-        # Botão para remover convênio
-        remove_button = tk.Button(self.modal, text="Remover Convênio", bg="#f44336", fg="white",
-                                  font=("Arial", 12), command=lambda: callback_remover(clinica, self.modal))
-        remove_button.pack(pady=10, padx=10)
+        self.btn_upload = ttk.Button(self.top, text='Upload de arquivo')
+        self.btn_upload.place(relx=0.167, rely=0.6, height=26, width=150)
 
-        # Botão para fechar a janela
-        close_button = tk.Button(self.modal, text="Fechar", bg="#2196F3", fg="white",
-                                 font=("Arial", 12), command=self.modal.destroy)
-        close_button.pack(pady=10, padx=10)
+        self.btn_remove = ttk.Button(self.top, text='Remover convênio')
+        self.btn_remove.place(relx=0.583, rely=0.6, height=26, width=150)
+
+        self.label_convenio = ttk.Label(self.top, text='Convênio selecionado!')
+        self.label_convenio.place(relx=0.2, rely=0.233, height=49, width=360)
+
+        # Barra de progresso
+        self.barra_progresso = ttk.Progressbar(self.top, length=300, mode='determinate')
+        self.barra_progresso.place(relx=0.083, rely=0.712, relwidth=0.833, height=19)
+
+def main():
+    global root
+    root = tk.Tk()
+    root.protocol('WM_DELETE_WINDOW', root.destroy)
+
+    app = Toplevel1(root)  # Inicializa a interface gráfica
+    root.mainloop()
+
+if __name__ == '__main__':
+    main()
